@@ -11,6 +11,7 @@ pids
 logs
 results
 prod/build
+prod/node_modules
 
 node_modules
 npm-debug.log
