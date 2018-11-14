@@ -13,3 +13,4 @@ results
 prod/build
 
 node_modules
+npm-debug.log
