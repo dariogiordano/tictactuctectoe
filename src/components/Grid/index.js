@@ -14,8 +14,8 @@ class Grid extends React.Component {
       matchStatus: null
     };
     this.togglePlayer = this.togglePlayer.bind(this);
-    this.socket = socketIOClient("http://localhost:8081");
-    // this.socket = socketIOClient("forza5.eu-west-3.elasticbeanstalk.com");
+  //  this.socket = socketIOClient("http://localhost:8081");
+     this.socket = socketIOClient("https://tictactuctoe.herokuapp.com");
 
     this.socket.on("set my player", newPlayer => {
       console.log(newPlayer);
