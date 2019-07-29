@@ -2,9 +2,10 @@ const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
 const path = require("path");
+const crypto = require('crypto');
 const app = express();
 // our localhost port
-const port = 8081;
+const port = process.env.PORT || 3000;
 // our server instance
 const server = http.createServer(app);
 // This creates our socket using the instance of the server
@@ -16,9 +17,9 @@ app.get("*", (req, res) => {
 server.listen(port, () => console.log(`Listening on port ${port}`));
 io.listen(server);
 //////////////////////////////////////////////
-const mountGrid = () => {
-  let h = Math.min(players[0][1], players[1][1]);
-  let w = Math.min(players[0][0], players[1][0]);
+const mountGrid = match => {
+  let h = Math.min(match.player1.cohhorinates[1], match.player1.cohhorinates[1]);
+  let w = Math.min(match.player2.cohhorinates[0], match.player2.cohhorinates[0]);
   //get number of cells
   w = Math.floor((w - 20) / 30);
   h = Math.floor((h - 60) / 30);
@@ -36,33 +37,54 @@ const mountGrid = () => {
   return grid;
 };
 var actualPlayer = "O";
-var players = [];
+var matches = [];
 
-const registerPlayer = cohordinates => {
-  players.push([...cohordinates]);
-  actualPlayer = actualPlayer === "O" ? "X" : "O";
-  console.log("actual ", actualPlayer);
+const registerPlayer = (cohordinates, roomName,symbol) => {
+ if(!roomName)
+ {
+  
+ 
+ }
 };
 
 io.on("connection", socket => {
   console.log("Users connected");
-  socket.on("register player", cohordinates => {
-    registerPlayer(cohordinates);
-    socket.emit("set my player", actualPlayer);
-    if (players.length === 2) {
+  socket.on("register player", (cohordinates, roomName=null,symbol) => {
+   
+   const newRoomName =roomName|| crypto.randomBytes(256).toString('hex');
+   registerPlayer(cohordinates, newRoomName,symbol);
+   socket.join(newRoomName)
+    if(!roomName){
+      let match={
+        roomName:newRoomName,
+        player1:{
+          cohordinates,
+          symbol
+        }
+      }
+      matches.push(match);
+        io.to(newRoomName).emit("set my player", newRoomName);
+    }else{
+     let match=matches.find(match=>match.roomName===roomName);
+     match.player2={
+      cohordinates,
+      symbol
+     }
       let state = {
-        grid: mountGrid(),
+        grid: mountGrid(match),
         matchStatus: "progress",
-        actualPlayer
+        actualPlayer,
+        roomeName:newRoomName
       };
-
-      io.sockets.emit("update", state);
+      io.to(newRoomName).emit("update", state);
     }
   });
+
   socket.on("moved", state => {
     actualPlayer = actualPlayer === "O" ? "X" : "O";
     state.actualPlayer = actualPlayer;
-    io.sockets.emit("update", state);
+
+    io.to(state.roomName).emit("update", state);
   });
   socket.on("won", state => {
     state.matchStatus = "lost";
@@ -72,7 +94,7 @@ io.on("connection", socket => {
       });
     });
     console.log(state.grid);
-    io.sockets.emit("update", state);
+    io.to(state.roomName).emit("update", state);
   });
 
   socket.on("player will unregister", () => {
