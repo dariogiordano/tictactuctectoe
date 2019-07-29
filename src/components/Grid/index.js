@@ -11,7 +11,8 @@ class Grid extends React.Component {
       myPlayer: null,
       actualPlayer: null,
       grid: [],
-      matchStatus: null
+      matchStatus: null,
+      roomName=null
     };
     this.togglePlayer = this.togglePlayer.bind(this);
   //  this.socket = socketIOClient("http://localhost:8081");
