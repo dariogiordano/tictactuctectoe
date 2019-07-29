@@ -12,7 +12,7 @@ class Grid extends React.Component {
       actualPlayer: null,
       grid: [],
       matchStatus: null,
-      roomName=null
+      roomName=this.props.roomName
     };
     this.togglePlayer = this.togglePlayer.bind(this);
   //  this.socket = socketIOClient("http://localhost:8081");

@@ -11,7 +11,7 @@ class Playground extends React.Component {
           <title>Home</title>
         </Helmet>
         <Link to="/">back</Link>
-        <Grid history={this.props.history} />
+        <Grid history={this.props.history} roomName={this.props.match.params.roomName} />
       </Container>
     );
   }
