@@ -15,8 +15,8 @@ class Grid extends React.Component {
       roomName:this.props.roomName
     };
     this.togglePlayer = this.togglePlayer.bind(this);
-    this.socket = socketIOClient("http://localhost:3000");
-   //  this.socket = socketIOClient("https://tictactuctoe.herokuapp.com");
+   // this.socket = socketIOClient("http://localhost:3000");
+     this.socket = socketIOClient("https://forza5.herokuapp.com/");
 
     this.socket.on("set my player", newRoomName => {
       console.log(newRoomName);
