@@ -15,8 +15,8 @@ class Grid extends React.Component {
       roomName:this.props.roomName
     };
     this.togglePlayer = this.togglePlayer.bind(this);
-   // this.socket = socketIOClient("http://localhost:3000");
-     this.socket = socketIOClient("https://forza5.herokuapp.com/");
+    this.socket = socketIOClient("http://localhost:3000");
+    // this.socket = socketIOClient("https://forza5.herokuapp.com/");
 
     this.socket.on("set my player", newRoomName => {
       console.log(newRoomName);
@@ -219,7 +219,8 @@ console.log(this.props.roomName);
 
   render() {
     if (this.state.matchStatus === null)
-      return <div>wait for the other player to join you roomName:{this.state.roomName}</div>;
+      return <div>Send this link to the person you want to play with:<br /><br />
+      https://forza5.herokuapp.com/play/{this.state.roomName}</div>;
     let message = "Wait for your opponent's move...";
     if (this.state.matchStatus === "won") message = "You WON!";
     else if (this.state.matchStatus === "lost") message = "You LOST!";
