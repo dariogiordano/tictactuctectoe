@@ -17,9 +17,12 @@ app.get("*", (req, res) => {
 server.listen(port, () => console.log(`Listening on port ${port}`));
 io.listen(server);
 //////////////////////////////////////////////
+
+var matches = [];
+
 const mountGrid = match => {
-  let h = Math.min(match.player1.cohhorinates[1], match.player1.cohhorinates[1]);
-  let w = Math.min(match.player2.cohhorinates[0], match.player2.cohhorinates[0]);
+  let h = Math.min(match.player1.cohordinates[1], match.player2.cohordinates[1]);
+  let w = Math.min(match.player1.cohordinates[0], match.player2.cohordinates[0]);
   //get number of cells
   w = Math.floor((w - 20) / 30);
   h = Math.floor((h - 60) / 30);
@@ -31,61 +34,58 @@ const mountGrid = match => {
   const centerHIndex = Math.floor(w / 2);
   let grid = [];
   for (let i = 0; i < h; i++) grid.push(new Array(w).fill("empty"));
-  let otherPlayer = actualPlayer === "O" ? "X" : "O";
+  let otherPlayer = match.actualPlayer === "O" ? "X" : "O";
   grid[centerVIndex].splice(centerHIndex, 1, otherPlayer);
-
   return grid;
 };
-var actualPlayer = "O";
-var matches = [];
-
-const registerPlayer = (cohordinates, roomName,symbol) => {
- if(!roomName)
- {
-  
- 
- }
-};
-
 io.on("connection", socket => {
-  console.log("Users connected");
-  socket.on("register player", (cohordinates, roomName=null,symbol) => {
-   
-   const newRoomName =roomName|| crypto.randomBytes(256).toString('hex');
-   registerPlayer(cohordinates, newRoomName,symbol);
-   socket.join(newRoomName)
+  console.log("User connected ");
+  socket.on("register player", (cohordinates, roomName,symbol) => {
+    const newRoomName =roomName || crypto.randomBytes(8).toString('hex');
+    socket.roomName=newRoomName;
+    socket.join(newRoomName)
+    //se non viene passato un roomName vuol dire che e una nuova partita: in questo caso va registrato il player numero1
     if(!roomName){
       let match={
+        actualPlayer:symbol,
         roomName:newRoomName,
         player1:{
           cohordinates,
-          symbol
+          symbol,
+          socket
         }
       }
       matches.push(match);
-        io.to(newRoomName).emit("set my player", newRoomName);
+      console.log("Player 1 registered. New room Name: ", newRoomName );
+      io.to(newRoomName).emit("set my player", newRoomName);
     }else{
-     let match=matches.find(match=>match.roomName===roomName);
-     match.player2={
-      cohordinates,
-      symbol
-     }
-      let state = {
-        grid: mountGrid(match),
-        matchStatus: "progress",
-        actualPlayer,
-        roomeName:newRoomName
-      };
-      io.to(newRoomName).emit("update", state);
+      let match=matches.find(match=>match.roomName===roomName);
+      if(match){
+        match.player2={
+          cohordinates,
+          symbol,
+          socket
+        }
+        let state = {
+          grid: mountGrid(match),
+          matchStatus: "progress",
+          actualPlayer:match.actualPlayer,
+          roomName:newRoomName
+        };
+        console.log("Player 2 registered. New room Name: ", newRoomName );
+        io.to(newRoomName).emit("update", state);
+      }
     }
   });
 
   socket.on("moved", state => {
-    actualPlayer = actualPlayer === "O" ? "X" : "O";
-    state.actualPlayer = actualPlayer;
-
+    let match=matches.find(match=>match.roomName===state.roomName);
+    match.actualPlayer = match.actualPlayer === "O" ? "X" : "O";
+    state.actualPlayer = match.actualPlayer;
+    console.log("UPDATE ROOM N°: ",state.roomName );
     io.to(state.roomName).emit("update", state);
   });
+
   socket.on("won", state => {
     state.matchStatus = "lost";
     state.grid = state.grid.map(row => {
@@ -93,18 +93,16 @@ io.on("connection", socket => {
         return cell === "win" ? "lost" : cell;
       });
     });
-    console.log(state.grid);
     io.to(state.roomName).emit("update", state);
   });
 
-  socket.on("player will unregister", () => {
+  socket.on("player will unregister", state => {
     socket.disconnect();
-    players = [];
   });
-
   socket.on("disconnect", () => {
-    players = [];
-    console.log("Users disconnected");
-    io.sockets.emit("left alone");
+    //rimuovo il match dalla lista dei match registrati
+    matches= matches.filter(match=>match.roomName!==socket.roomName);
+    io.to(socket.roomName).emit("left alone");
+    console.log(`User from room n° ${socket.roomName} disconnected`);
   });
 });

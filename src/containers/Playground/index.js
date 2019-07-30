@@ -8,7 +8,7 @@ class Playground extends React.Component {
     return (
       <Container>
         <Helmet>
-          <title>Home</title>
+          <title>Play</title>
         </Helmet>
         <Link to="/">back</Link>
         <Grid history={this.props.history} roomName={this.props.match.params.roomName} />

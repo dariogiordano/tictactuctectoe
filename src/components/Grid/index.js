@@ -12,16 +12,17 @@ class Grid extends React.Component {
       actualPlayer: null,
       grid: [],
       matchStatus: null,
-      roomName=this.props.roomName
+      roomName:this.props.roomName
     };
     this.togglePlayer = this.togglePlayer.bind(this);
-  //  this.socket = socketIOClient("http://localhost:8081");
-     this.socket = socketIOClient("https://tictactuctoe.herokuapp.com");
+    this.socket = socketIOClient("http://localhost:3000");
+   //  this.socket = socketIOClient("https://tictactuctoe.herokuapp.com");
 
-    this.socket.on("set my player", newPlayer => {
-      console.log(newPlayer);
+    this.socket.on("set my player", newRoomName => {
+      console.log(newRoomName);
+      if(newRoomName)
       this.setState(state => ({
-        myPlayer: newPlayer
+        roomName: newRoomName
       }));
     });
     this.socket.on("left alone", () => {
@@ -131,6 +132,7 @@ class Grid extends React.Component {
     } else {
       let newState = { ...this.state };
       newState.grid = grid;
+      
       this.socket.emit("moved", newState);
     }
   }
@@ -188,18 +190,36 @@ class Grid extends React.Component {
   }
 
   componentDidMount() {
+    if(this.props.roomName){
+console.log(this.props.roomName);
+    
     this.socket.emit("register player", [
       window.innerWidth,
       window.innerHeight
-    ]);
+    ],this.props.roomName,"O");
+
+    this.setState(state => ({
+     
+      myPlayer:"O"
+    }));
+    }else{
+      this.socket.emit("register player", [
+        window.innerWidth,
+        window.innerHeight
+      ],null,"X");
+      this.setState(state => ({
+     
+        myPlayer:"X"
+      }));
+    }
   }
   componentWillUnmount() {
-    this.socket.emit("player will unregister");
+    this.socket.emit("player will unregister",this.state);
   }
 
   render() {
     if (this.state.matchStatus === null)
-      return <div>wait for the other player to join you</div>;
+      return <div>wait for the other player to join you roomName:{this.state.roomName}</div>;
     let message = "Wait for your opponent's move...";
     if (this.state.matchStatus === "won") message = "You WON!";
     else if (this.state.matchStatus === "lost") message = "You LOST!";

@@ -12,8 +12,9 @@ class App extends Component {
       <Router>
         <div>
           <Route path="/" exact component={Home} />
-          <Route path="/play/:roomName" component={Playground} />
-          <Route path="/quitted/" component={Quitted} />
+          <Route path="/play/" exact component={Playground} />
+          <Route path="/play/:roomName" exact component={Playground} />
+          <Route path="/quitted/" exact component={Quitted} />
         </div>
       </Router>
     );
