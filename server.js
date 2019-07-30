@@ -10,7 +10,7 @@ const port = process.env.PORT || 3000;
 const server = http.createServer(app);
 // This creates our socket using the instance of the server
 const io = socketIO();
-app.use(express.static(path.join(__dirname, "build")));
+app.use(express.static(path.join(__dirname, "prod/build")));
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "prod/build", "index.html"));
 });
