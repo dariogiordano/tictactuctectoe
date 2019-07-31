@@ -12,7 +12,8 @@ class Grid extends React.Component {
       actualPlayer: null,
       grid: [],
       matchStatus: null,
-      roomName:this.props.roomName
+      roomName:this.props.roomName,
+      standby:false
     };
     this.togglePlayer = this.togglePlayer.bind(this);
     //this.socket = socketIOClient("http://localhost:3000");
@@ -26,8 +27,19 @@ class Grid extends React.Component {
       }));
     });
     this.socket.on("left alone", () => {
-      //alert("Your opponent quitted!");
+     // alert("Your opponent disconnected!");
       this.props.history.push(`/quitted/`);
+    });
+    this.socket.on("connection lost", () => {
+     
+       this.state.standby=true;
+     });
+     this.socket.on("connection recovered", () => {
+     
+      this.state.standby=false;
+    });
+    this.socket.on('reconnect', (attemptNumber) => {
+      this.socket.emit("player reconnected", this.state.roomName,this.state.myPlayer);
     });
     this.socket.on("update", newState => {
       if (this.state.matchStatus !== "won") {
@@ -191,24 +203,20 @@ class Grid extends React.Component {
 
   componentDidMount() {
     if(this.props.roomName){
-console.log(this.props.roomName);
-    
-    this.socket.emit("register player", [
-      window.innerWidth,
-      window.innerHeight
-    ],this.props.roomName,"O");
+      this.socket.emit("register player", [
+        window.innerWidth,
+        window.innerHeight
+      ],this.props.roomName,"O");
 
-    this.setState(state => ({
-     
-      myPlayer:"O"
-    }));
+      this.setState(state => ({
+        myPlayer:"O"
+      }));
     }else{
       this.socket.emit("register player", [
         window.innerWidth,
         window.innerHeight
       ],null,"X");
       this.setState(state => ({
-     
         myPlayer:"X"
       }));
     }

@@ -40,9 +40,13 @@ const mountGrid = match => {
 };
 io.on("connection", socket => {
   console.log("User connected ");
+  socket.on("user reconnected", roomName => {
+    socket.roomName=roomName;
+    io.to(socket.roomName).emit("connection recovered");
+  });
   socket.on("register player", (cohordinates, roomName,symbol) => {
     const newRoomName =roomName || crypto.randomBytes(2).toString('hex');
-    socket.roomName=newRoomName;
+  
     socket.join(newRoomName)
     //se non viene passato un roomName vuol dire che e una nuova partita: in questo caso va registrato il player numero1
     if(!roomName){
@@ -97,12 +101,14 @@ io.on("connection", socket => {
   });
 
   socket.on("player will unregister", state => {
-    socket.disconnect();
+    
+     matches= matches.filter(match=>match.roomName!==socket.roomName);
+    io.to(socket.roomName).emit("left alone");
+    console.log(`User from room n° ${socket.roomName} disconnected`);
+   // socket.disconnect();
   });
   socket.on("disconnect", () => {
     //rimuovo il match dalla lista dei match registrati
-    matches= matches.filter(match=>match.roomName!==socket.roomName);
-    io.to(socket.roomName).emit("left alone");
-    console.log(`User from room n° ${socket.roomName} disconnected`);
+   io.to(socket.roomName).emit("connection lost");
   });
 });
