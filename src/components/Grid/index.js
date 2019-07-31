@@ -32,13 +32,13 @@ class Grid extends React.Component {
     });
     this.socket.on("connection lost", () => {
       this.setState(state => ({
-        standby: false
+        standby: true
       }));
       
      });
      this.socket.on("connection recovered", () => {
       this.setState(state => ({
-        standby: true
+        standby: false
       }));
       
     });
@@ -226,7 +226,7 @@ class Grid extends React.Component {
     }
   }
   componentWillUnmount() {
-    this.socket.emit("player will unregister",this.state);
+    this.socket.emit("player will unregister");
   }
 
   render() {

@@ -101,7 +101,7 @@ io.on("connection", socket => {
     io.to(state.roomName).emit("update", state);
   });
 
-  socket.on("player will unregister", state => {
+  socket.on("player will unregister", () => {
     
      matches= matches.filter(match=>match.roomName!==socket.roomName);
     io.to(socket.roomName).emit("left alone");
