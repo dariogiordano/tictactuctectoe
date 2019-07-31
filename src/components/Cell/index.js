@@ -14,6 +14,7 @@ class Cell extends React.Component {
       <StyledCell
         filled={this.props.status !== "empty"}
         usable={this.props.usable}
+        userSign={this.props.userSign}
         onClick={this.handleChange}
       >
         {this.props.status === "empty" ? " " : this.props.status}

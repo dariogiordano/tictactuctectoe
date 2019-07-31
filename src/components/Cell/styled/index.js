@@ -23,11 +23,17 @@ const styledCell = styled.div`
       props.usable &&
       `cursor: pointer;
      background: rgba(0,255,0,0.5); 
+     :before{
+       content:"${props.userSign}"
+     }
      `};
     ${props =>
       props.filled &&
       `
      background: transparent; 
+     :before{
+      content:" "
+    }
      `};
   }
 `;

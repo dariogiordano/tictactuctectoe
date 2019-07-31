@@ -231,6 +231,7 @@ console.log(this.props.roomName);
       <div>
         <p>{message}</p>
         <StyledGrid>
+          <div>
           {this.state.grid.map((row, vIndex) => (
             <Row key={vIndex} rowHeight={this.state.grid.length}>
               {this.state.grid[vIndex].map((item, hIndex) => (
@@ -242,11 +243,13 @@ console.log(this.props.roomName);
                   key={hIndex}
                   status={this.state.grid[vIndex][hIndex]}
                   usable={this.getIsUsable(vIndex, hIndex)}
+                  userSign={this.state.myPlayer}
                   onCellClick={this.togglePlayer}
                 />
               ))}
             </Row>
           ))}
+          </div>
         </StyledGrid>
       </div>
     );

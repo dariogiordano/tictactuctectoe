@@ -24,8 +24,8 @@ const mountGrid = match => {
   let h = Math.min(match.player1.cohordinates[1], match.player2.cohordinates[1]);
   let w = Math.min(match.player1.cohordinates[0], match.player2.cohordinates[0]);
   //get number of cells
-  w = Math.floor((w - 20) / 30);
-  h = Math.floor((h - 60) / 30);
+  w = Math.floor((w - 50) / 40);
+  h = Math.floor((h - 100) / 40);
   //if with and height are even get the closest odd
 
   w = w % 2 ? w : w - 1;

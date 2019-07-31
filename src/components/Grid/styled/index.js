@@ -1,7 +1,11 @@
 import styled from "styled-components";
 
 const StyledGrid = styled.div`
-  display: inline-block;
+  display: flex;
+  justify-content: center;
 `;
 
+
 export default StyledGrid;
+
+
