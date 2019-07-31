@@ -31,12 +31,16 @@ class Grid extends React.Component {
       this.props.history.push(`/quitted/`);
     });
     this.socket.on("connection lost", () => {
-     
-       this.state.standby=true;
+      this.setState(state => ({
+        standby: false
+      }));
+      
      });
      this.socket.on("connection recovered", () => {
-     
-      this.state.standby=false;
+      this.setState(state => ({
+        standby: true
+      }));
+      
     });
     this.socket.on('reconnect', (attemptNumber) => {
       this.socket.emit("player reconnected", this.state.roomName,this.state.myPlayer);
