@@ -42,6 +42,7 @@ io.on("connection", socket => {
   console.log("User connected ");
   socket.on("user reconnected", roomName => {
     socket.roomName=roomName;
+    socket.join(roomName);
     io.to(socket.roomName).emit("connection recovered");
   });
   socket.on("register player", (cohordinates, roomName,symbol) => {
