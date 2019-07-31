@@ -41,7 +41,7 @@ const mountGrid = match => {
 io.on("connection", socket => {
   console.log("User connected ");
   socket.on("register player", (cohordinates, roomName,symbol) => {
-    const newRoomName =roomName || crypto.randomBytes(8).toString('hex');
+    const newRoomName =roomName || crypto.randomBytes(2).toString('hex');
     socket.roomName=newRoomName;
     socket.join(newRoomName)
     //se non viene passato un roomName vuol dire che e una nuova partita: in questo caso va registrato il player numero1
