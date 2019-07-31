@@ -43,7 +43,7 @@ class Grid extends React.Component {
       
     });
     this.socket.on('reconnect', (attemptNumber) => {
-      this.socket.emit("player reconnected", this.state.roomName,this.state.myPlayer);
+      this.socket.emit("user reconnected", this.state.roomName,this.state.myPlayer);
     });
     this.socket.on("update", newState => {
       if (this.state.matchStatus !== "won") {
@@ -231,7 +231,7 @@ class Grid extends React.Component {
 
   render() {
     if (this.state.standby === true)
-    return <div>waiting to reconnect with your opponent </div>
+    return <div> Waiting to reconnect with your opponent </div>
     if (this.state.matchStatus === null)
       return <div>Send this link to the person you want to play with:<br /><br /> <strong>https://forza5.herokuapp.com/play/{this.state.roomName}</strong></div>;
     let message = "Wait for your opponent's move...";
