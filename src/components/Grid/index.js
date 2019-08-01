@@ -15,9 +15,10 @@ class Grid extends React.Component {
       roomName:this.props.roomName,
       standby:false
     };
+    this.onUnload = this.onUnload.bind(this);
     this.togglePlayer = this.togglePlayer.bind(this);
-    //this.socket = socketIOClient("http://localhost:3000");
-     this.socket = socketIOClient("https://forza5.herokuapp.com/");
+    this.socket = socketIOClient("http://localhost:3001");
+     //this.socket = socketIOClient("https://forza5.herokuapp.com/");
 
     this.socket.on("set my player", newRoomName => {
       console.log(newRoomName);
@@ -132,6 +133,11 @@ class Grid extends React.Component {
     } else return [];
   }
 
+  onUnload(){
+
+    this.socket.emit("player will unregister");
+  }
+
   togglePlayer(vIndex, hIndex) {
     let grid = this.state.grid;
     grid[vIndex][hIndex] = this.state.myPlayer;
@@ -206,6 +212,7 @@ class Grid extends React.Component {
   }
 
   componentDidMount() {
+    window.addEventListener("beforeunload", this.onUnload)
     if(this.props.roomName){
       this.socket.emit("register player", [
         window.innerWidth,
@@ -226,6 +233,7 @@ class Grid extends React.Component {
     }
   }
   componentWillUnmount() {
+    window.removeEventListener("beforeunload", this.onUnload)
     this.socket.emit("player will unregister");
   }
 

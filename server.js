@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const app = express();
 // our localhost port
 const port = process.env.PORT || 3000;
+//const port = 3001;
 // our server instance
 const server = http.createServer(app);
 // This creates our socket using the instance of the server
@@ -47,7 +48,7 @@ io.on("connection", socket => {
   });
   socket.on("register player", (cohordinates, roomName,symbol) => {
     const newRoomName =roomName || crypto.randomBytes(2).toString('hex');
-  
+    socket.roomName=newRoomName;
     socket.join(newRoomName)
     //se non viene passato un roomName vuol dire che e una nuova partita: in questo caso va registrato il player numero1
     if(!roomName){
