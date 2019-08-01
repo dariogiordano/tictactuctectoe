@@ -46,6 +46,7 @@ io.on("connection", socket => {
     socket.join(roomName);
     io.to(socket.roomName).emit("connection recovered");
   });
+
   socket.on("register player", (cohordinates, roomName,symbol) => {
     const newRoomName =roomName || crypto.randomBytes(2).toString('hex');
     socket.roomName=newRoomName;
@@ -62,7 +63,7 @@ io.on("connection", socket => {
         }
       }
       matches.push(match);
-      console.log("Player 1 registered. New room Name: ", newRoomName );
+      console.log(`Player 1 registered. New room Name: ${socket.roomName}`);
       io.to(newRoomName).emit("set my player", newRoomName);
     }else{
       let match=matches.find(match=>match.roomName===roomName);
@@ -74,11 +75,11 @@ io.on("connection", socket => {
         }
         let state = {
           grid: mountGrid(match),
-          matchStatus: "progress",
+          matchStatus: "new game",
           actualPlayer:match.actualPlayer,
           roomName:newRoomName
         };
-        console.log("Player 2 registered. New room Name: ", newRoomName );
+        console.log(`Player 2 registered. New room Name: ${socket.roomName}`);
         io.to(newRoomName).emit("update", state);
       }
     }
@@ -88,7 +89,7 @@ io.on("connection", socket => {
     let match=matches.find(match=>match.roomName===state.roomName);
     match.actualPlayer = match.actualPlayer === "O" ? "X" : "O";
     state.actualPlayer = match.actualPlayer;
-    console.log("UPDATE ROOM N°: ",state.roomName );
+    console.log(`Update room n° ${socket.roomName}`)
     io.to(state.roomName).emit("update", state);
   });
 
@@ -102,10 +103,18 @@ io.on("connection", socket => {
     io.to(state.roomName).emit("update", state);
   });
 
+  socket.on("new game", state => {
+    console.log(`New game in room n° ${socket.roomName}`)
+    let match=matches.find(match=>match.roomName===state.roomName);
+    match.actualPlayer = state.myPlayer === "O" ? "X" : "O";
+    state.actualPlayer = match.actualPlayer;
+    state.grid = mountGrid(match);
+    state.matchStatus = "new game";
+    io.to(state.roomName).emit("update", state);
+  });
+
   socket.on("player will unregister", () => {
-    
     matches= matches.filter(match=>match.roomName!==socket.roomName);
-    
     console.log(`User from room n° ${socket.roomName} disconnected`);
     socket.leftRoom=true;
     socket.disconnect();

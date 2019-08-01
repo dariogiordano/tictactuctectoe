@@ -15,10 +15,12 @@ class Grid extends React.Component {
       roomName:this.props.roomName,
       standby:false
     };
+    
     this.onUnload = this.onUnload.bind(this);
     this.togglePlayer = this.togglePlayer.bind(this);
+    this.newGame = this.newGame.bind(this);
     //this.socket = socketIOClient("http://localhost:3001");
-     this.socket = socketIOClient("https://forza5.herokuapp.com/");
+    this.socket = socketIOClient("https://forza5.herokuapp.com/");
 
     this.socket.on("set my player", newRoomName => {
       console.log(newRoomName);
@@ -47,8 +49,9 @@ class Grid extends React.Component {
       this.socket.emit("user reconnected", this.state.roomName,this.state.myPlayer);
     });
     this.socket.on("update", newState => {
-      if (this.state.matchStatus !== "won") {
-        this.setState(() => ({
+  
+      if (this.state.matchStatus !== "won" || newState.matchStatus==="new game") {
+        this.setState(state => ({
           grid: newState.grid,
           actualPlayer: newState.actualPlayer,
           matchStatus: newState.matchStatus
@@ -137,6 +140,10 @@ class Grid extends React.Component {
 
     this.socket.emit("player will unregister");
   }
+  newGame(){
+    let newState = { ...this.state };
+    this.socket.emit("new game", newState);
+  }
 
   togglePlayer(vIndex, hIndex) {
     let grid = this.state.grid;
@@ -152,9 +159,10 @@ class Grid extends React.Component {
       }));
       this.socket.emit("won", this.state);
     } else {
+
       let newState = { ...this.state };
       newState.grid = grid;
-      
+      newState.matchStatus="progress";
       this.socket.emit("moved", newState);
     }
   }
@@ -203,11 +211,8 @@ class Grid extends React.Component {
     let siblings = this.getSiblings(vIndex, hIndex);
     return (
       siblings.some(el => {
-        return el.value === "O";
-      }) ||
-      siblings.some(el => {
-        return el.value === "X";
-      })
+        return el.value === "O" || el.value === "X";
+      }) 
     );
   }
 
@@ -232,6 +237,7 @@ class Grid extends React.Component {
       }));
     }
   }
+
   componentWillUnmount() {
     window.removeEventListener("beforeunload", this.onUnload)
     this.socket.emit("player will unregister");
@@ -239,18 +245,18 @@ class Grid extends React.Component {
 
   render() {
     if (this.state.standby === true)
-    return <div> Waiting to reconnect with your opponent </div>
+    return <div> Waiting to reconnect with your opponent... </div>
     if (this.state.matchStatus === null)
-      return <div>Send this link to the person you want to play with:<br /><br /> <strong>https://forza5.herokuapp.com/play/{this.state.roomName}</strong></div>;
+      return <div>Send this link to the person you want to play with:<br /><br /> <strong>{window.location.href}/{this.state.roomName}</strong></div>;
     let message = "Wait for your opponent's move...";
     if (this.state.matchStatus === "won") message = "You WON!";
     else if (this.state.matchStatus === "lost") message = "You LOST!";
-    else if (this.state.myPlayer === this.state.actualPlayer)
-      message = "Make your move!";
-
+    else if (this.state.myPlayer === this.state.actualPlayer) message = "Make your move!";
+    if (this.state.matchStatus === "new game") message = "NEW GAME! "+ message;
+ 
     return (
       <div>
-        <p>{message}</p>
+        <p>{message} {(this.state.matchStatus === "won" || this.state.matchStatus === "lost") && (<button onClick={this.newGame}>click to start a new game</button>)}</p>
         <StyledGrid>
           <div>
           {this.state.grid.map((row, vIndex) => (
