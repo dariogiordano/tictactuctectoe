@@ -103,13 +103,17 @@ io.on("connection", socket => {
 
   socket.on("player will unregister", () => {
     
-     matches= matches.filter(match=>match.roomName!==socket.roomName);
-    io.to(socket.roomName).emit("left alone");
+    matches= matches.filter(match=>match.roomName!==socket.roomName);
+    
     console.log(`User from room n° ${socket.roomName} disconnected`);
-   // socket.disconnect();
+    socket.leftRoom=true;
+    socket.disconnect();
   });
   socket.on("disconnect", () => {
     //rimuovo il match dalla lista dei match registrati
+    if(socket.leftRoom)
+    io.to(socket.roomName).emit("left alone");
+    else
    io.to(socket.roomName).emit("connection lost");
   });
 });
