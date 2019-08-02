@@ -15,13 +15,13 @@ class Grid extends React.Component {
       roomName:this.props.roomName,
       standby:false
     };
-    
+
     this.onUnload = this.onUnload.bind(this);
     this.togglePlayer = this.togglePlayer.bind(this);
     this.newGame = this.newGame.bind(this);
     //this.socket = socketIOClient("http://localhost:3001");
     this.socket = socketIOClient("https://forza5.herokuapp.com/");
-
+    this.highlightCohordinates=[];
     this.socket.on("set my player", newRoomName => {
       console.log(newRoomName);
       if(newRoomName)
@@ -29,28 +29,38 @@ class Grid extends React.Component {
         roomName: newRoomName
       }));
     });
+
     this.socket.on("left alone", () => {
-     // alert("Your opponent disconnected!");
       this.props.history.push(`/quitted/`);
     });
+
     this.socket.on("connection lost", () => {
       this.setState(state => ({
         standby: true
-      }));
-      
-     });
-     this.socket.on("connection recovered", () => {
+      })); 
+    });
+
+    this.socket.on("connection recovered", () => {
       this.setState(state => ({
         standby: false
       }));
-      
     });
+
     this.socket.on('reconnect', (attemptNumber) => {
       this.socket.emit("user reconnected", this.state.roomName,this.state.myPlayer);
     });
-    this.socket.on("update", newState => {
-  
+
+    /*
+    "Update" si verifica ogni volta che uno dei due giocatori effettua una mossa,
+    subito dopo la mia mossa anche io ricevo l'update
+    */
+    this.socket.on("update", (newState, vIndex, hIndex) => {
+      //se il mio status è in WON vuol dire che ho vinsto en on accetto più cambiamenti, almento che
+      //il nuovo stato in arrivo non sia "New game", il che vuol dire che il mio avversario ha chiesto un'altra partita
       if (this.state.matchStatus !== "won" || newState.matchStatus==="new game") {
+        //vIndex, hIndex e la posizione della casella riempita dall'avversario la mossa precedente.
+        if(vIndex && hIndex)
+          this.highlightCohordinates=[vIndex,hIndex];
         this.setState(state => ({
           grid: newState.grid,
           actualPlayer: newState.actualPlayer,
@@ -62,36 +72,14 @@ class Grid extends React.Component {
 
   getNewItemIndexes(vIndex, hIndex, direction) {
     switch (direction) {
-      case "NW":
-        vIndex--;
-        hIndex--;
-        break;
-      case "N":
-        vIndex--;
-        break;
-      case "NE":
-        vIndex--;
-        hIndex++;
-        break;
-      case "E":
-        hIndex++;
-        break;
-      case "SE":
-        vIndex++;
-        hIndex++;
-        break;
-      case "S":
-        vIndex++;
-        break;
-      case "SW":
-        vIndex++;
-        hIndex--;
-        break;
-      case "W":
-        hIndex--;
-        break;
-      default:
-        break;
+      case "NW": vIndex--; hIndex--; break;
+      case "N": vIndex--; break;
+      case "NE": vIndex--; hIndex++; break;
+      case "E": hIndex++; break;
+      case "SE": vIndex++; hIndex++; break;
+      case "S": vIndex++; break;
+      case "SW": vIndex++; hIndex--; break;
+      case "W": hIndex--; break;
     }
     return { vIndex, hIndex };
   }
@@ -137,9 +125,9 @@ class Grid extends React.Component {
   }
 
   onUnload(){
-
     this.socket.emit("player will unregister");
   }
+
   newGame(){
     let newState = { ...this.state };
     this.socket.emit("new game", newState);
@@ -147,6 +135,7 @@ class Grid extends React.Component {
 
   togglePlayer(vIndex, hIndex) {
     let grid = this.state.grid;
+    this.highlightCohordinates=[];
     grid[vIndex][hIndex] = this.state.myPlayer;
     let itemsInARow = this.getItemsInARow(vIndex, hIndex);
     if (itemsInARow.length === 5) {
@@ -163,7 +152,7 @@ class Grid extends React.Component {
       let newState = { ...this.state };
       newState.grid = grid;
       newState.matchStatus="progress";
-      this.socket.emit("moved", newState);
+      this.socket.emit("moved", newState,vIndex, hIndex);
     }
   }
 
@@ -214,6 +203,14 @@ class Grid extends React.Component {
         return el.value === "O" || el.value === "X";
       }) 
     );
+  }
+
+  getIsHighlight(vIndex, hIndex){
+    if(this.highlightCohordinates.length>1
+      && this.highlightCohordinates[0]===vIndex
+      && this.highlightCohordinates[1]===hIndex
+      && this.state.myPlayer===this.state.actualPlayer) return true;
+    else return false;
   }
 
   componentDidMount() {
@@ -270,6 +267,7 @@ class Grid extends React.Component {
                   key={hIndex}
                   status={this.state.grid[vIndex][hIndex]}
                   usable={this.getIsUsable(vIndex, hIndex)}
+                  highlight={this.getIsHighlight(vIndex, hIndex)}
                   userSign={this.state.myPlayer}
                   onCellClick={this.togglePlayer}
                 />

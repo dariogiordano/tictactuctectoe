@@ -79,18 +79,18 @@ io.on("connection", socket => {
           actualPlayer:match.actualPlayer,
           roomName:newRoomName
         };
-        console.log(`Player 2 registered. New room Name: ${socket.roomName}`);
+        console.log(`Player 2 registered. Room Name: ${socket.roomName}`);
         io.to(newRoomName).emit("update", state);
       }
     }
   });
 
-  socket.on("moved", state => {
+  socket.on("moved", (state,vIndex, hIndex) => {
     let match=matches.find(match=>match.roomName===state.roomName);
     match.actualPlayer = match.actualPlayer === "O" ? "X" : "O";
     state.actualPlayer = match.actualPlayer;
     console.log(`Update room n° ${socket.roomName}`)
-    io.to(state.roomName).emit("update", state);
+    io.to(state.roomName).emit("update", state,vIndex, hIndex);
   });
 
   socket.on("won", state => {
