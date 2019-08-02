@@ -10,11 +10,12 @@ class Cell extends React.Component {
       this.props.onCellClick(this.props.vIndex, this.props.hIndex);
   }
   render() {
+    var className=`${this.props.highlight? "flash":""} ${this.props.status === "win"? "won":""} ${this.props.status === "lost"? "lost":""}`;
     return (
       <StyledCell
         filled={this.props.status !== "empty"}
         usable={this.props.usable}
-        className={this.props.highlight&&"flash"}
+        className={className}
         userSign={this.props.userSign}
         onClick={this.handleChange}
       >

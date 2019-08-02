@@ -37,41 +37,22 @@ const styledCell = styled.div`
   }
 
   &.flash {
-    -moz-animation: flash 1s ease-out;
-    -moz-animation-iteration-count: 1;
-    -webkit-animation: flash 1s ease-out;
-    -webkit-animation-iteration-count: 1;
-    -ms-animation: flash 1s ease-out;
-    -ms-animation-iteration-count: 1;
+   
     animation: flash 1s ease-out;
     animation-iteration-count: 1;
   }
-  
-  @-webkit-keyframes flash {
-      0% { 
-        background-color: #ffffff; 
-      }
-      10% { 
-        background-color: #00ff00; 
-      }        
-      100% {
-        background-color: #ffffff;
-      }
+  &.won {
+   
+    animation: won 1s ease-out;
+    animation-iteration-count: 5;
+  }
+  &.lost {
+   
+    animation: lost 1s ease-out;
+    animation-iteration-count: 5;
   }
   
-  @-moz-keyframes flash {
-    0% { 
-      background-color: #ffffff; 
-    }
-    10% { 
-      background-color: #00ff00; 
-    }        
-    100% {
-      background-color: #ffffff;
-    }
-  }
-  
-  @-ms-keyframes flash {
+  @keyframes flash {
     0% { 
       background-color: #ffffff; 
     }
@@ -83,16 +64,23 @@ const styledCell = styled.div`
     }
   }
 
-  @keyframes flash {
+  @keyframes won {
     0% { 
       background-color: #ffffff; 
     }
-    10% { 
-      background-color: #00ff00; 
+    50% { 
+      background-color: #aaffaa; 
     }        
-    100% {
-      background-color: #ffffff;
+   
+  }
+  @keyframes lost {
+    0% { 
+      background-color: #ffffff; 
     }
+    50% { 
+      background-color: #ffaaaa; 
+    }        
+  
   }
   
 `;

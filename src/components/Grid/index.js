@@ -59,8 +59,8 @@ class Grid extends React.Component {
       //il nuovo stato in arrivo non sia "New game", il che vuol dire che il mio avversario ha chiesto un'altra partita
       if (this.state.matchStatus !== "won" || newState.matchStatus==="new game") {
         //vIndex, hIndex e la posizione della casella riempita dall'avversario la mossa precedente.
-        if(vIndex && hIndex)
-          this.highlightCohordinates=[vIndex,hIndex];
+        if(vIndex && hIndex) this.highlightCohordinates=[vIndex,hIndex];
+        else this.highlightCohordinates=[];
         this.setState(state => ({
           grid: newState.grid,
           actualPlayer: newState.actualPlayer,
