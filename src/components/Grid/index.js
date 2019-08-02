@@ -1,6 +1,7 @@
 import React from "react";
 import socketIOClient from "socket.io-client";
 import Cell from "../../components/Cell";
+import CopyToClipboard from "../../components/CopyToClipboard";
 import Row from "../../components/Row";
 import StyledGrid from "./styled";
 
@@ -243,8 +244,13 @@ class Grid extends React.Component {
   render() {
     if (this.state.standby === true)
     return <div> Waiting to reconnect with your opponent... </div>
-    if (this.state.matchStatus === null)
-      return <div>Send this link to the person you want to play with:<br /><br /> <strong>{window.location.href}/{this.state.roomName}</strong></div>;
+    if (this.state.matchStatus === null){
+      var content=`${window.location.href}/${this.state.roomName}`;
+      return <div>
+        Send this link to the person you want to play with:<br /><br />
+        <CopyToClipboard content={content} />
+      </div>;
+    }
     let message = "Wait for your opponent's move...";
     if (this.state.matchStatus === "won") message = "You WON!";
     else if (this.state.matchStatus === "lost") message = "You LOST!";
