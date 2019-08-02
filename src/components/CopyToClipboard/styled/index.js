@@ -12,7 +12,7 @@ input{
   
   overflow: visible;
   padding: 0;
-  min-width: 230px;
+  min-width: 250px;
   font-weight:bold
 }
 button{

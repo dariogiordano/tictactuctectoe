@@ -23,8 +23,8 @@ class CopyToClipboard extends React.Component {
   }
   render() {
     return (
-      <StyledCopyToClipboard onClick={this.handleChange} className="">
-           <input type="text" id="myCopyInput" readOnly value={this.props.content} /><button>{this.state.copied?'copied':'click to copy'}</button>
+      <StyledCopyToClipboard>
+           <input type="text" id="myCopyInput" readOnly value={this.props.content} /> <button onClick={this.handleChange}>{this.state.copied?'copied':'click to copy'}</button>
       </StyledCopyToClipboard>
     );
   }
