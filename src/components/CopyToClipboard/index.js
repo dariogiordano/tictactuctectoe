@@ -9,29 +9,28 @@ class CopyToClipboard extends React.Component {
   handleChange() {
     var copyText = document.getElementById("myCopyInput");
     var isiOSDevice = navigator.userAgent.match(/ipad|iphone/i);
+    if (isiOSDevice) {
+      
+      var editable = copyText.contentEditable;
+      var readOnly = copyText.readOnly;
 
-	if (isiOSDevice) {
-	  
-		var editable = copyText.contentEditable;
-		var readOnly = copyText.readOnly;
+      copyText.contentEditable = true;
+      copyText.readOnly = false;
 
-		copyText.contentEditable = true;
-		copyText.readOnly = false;
+      var range = document.createRange();
+      range.selectNodeContents(copyText);
 
-		var range = document.createRange();
-		range.selectNodeContents(copyText);
+      var selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
 
-		var selection = window.getSelection();
-		selection.removeAllRanges();
-		selection.addRange(range);
+      copyText.setSelectionRange(0, 999999);
+      copyText.contentEditable = editable;
+      copyText.readOnly = readOnly;
 
-		copyText.setSelectionRange(0, 999999);
-		copyText.contentEditable = editable;
-		copyText.readOnly = readOnly;
-
-	} else {
-    copyText.select();
-	}
+    } else {
+      copyText.select();
+    }
 
     
   
@@ -41,7 +40,6 @@ class CopyToClipboard extends React.Component {
     this.setState(state=>({
         copied:true
     }));
-    copyText.focus();
     copyText.selectionEnd = copyText.selectionStart;
   }
   render() {
