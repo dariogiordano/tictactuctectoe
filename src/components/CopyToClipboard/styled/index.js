@@ -3,16 +3,16 @@ import styled from "styled-components";
 const styledCopyToClipboard = styled.div`
 display:flex;
 input{
-    margin: 0;
+  margin: 0;
   outline: 0;
   vertical-align: middle;
   background: none;
   border: 0;
   cursor: pointer;
-  
-  overflow: visible;
+  font-size:16px;
+
   padding: 0;
-  min-width: 250px;
+ 
   font-weight:bold
 }
 button{
