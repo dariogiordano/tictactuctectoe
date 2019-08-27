@@ -10,9 +10,8 @@ input{
   border: 0;
   cursor: pointer;
   font-size:16px;
-  display:block;
+  width:320px;
   padding: 0;
-
   font-weight:bold
 }
 button{
