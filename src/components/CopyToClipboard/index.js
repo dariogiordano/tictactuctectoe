@@ -8,9 +8,32 @@ class CopyToClipboard extends React.Component {
   }
   handleChange() {
     var copyText = document.getElementById("myCopyInput");
+    var isiOSDevice = navigator.userAgent.match(/ipad|iphone/i);
 
-    /* Select the text field */
+	if (isiOSDevice) {
+	  
+		var editable = copyText.contentEditable;
+		var readOnly = copyText.readOnly;
+
+		copyText.contentEditable = true;
+		copyText.readOnly = false;
+
+		var range = document.createRange();
+		range.selectNodeContents(copyText);
+
+		var selection = window.getSelection();
+		selection.removeAllRanges();
+		selection.addRange(range);
+
+		copyText.setSelectionRange(0, 999999);
+		copyText.contentEditable = editable;
+		copyText.readOnly = readOnly;
+
+	} else {
     copyText.select();
+	}
+
+    
   
     /* Copy the text inside the text field */
     document.execCommand("copy");
