@@ -40,7 +40,7 @@ const mountGrid = match => {
   return grid;
 };
 io.on("connection", socket => {
-  console.log("User connected ");
+  console.log("User connected ", socket.id);
   socket.on("user reconnected", roomName => {
     socket.roomName=roomName;
     socket.join(roomName);
