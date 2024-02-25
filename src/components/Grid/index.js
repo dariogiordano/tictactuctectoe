@@ -200,7 +200,7 @@ class Grid extends React.Component {
     let siblings = this.getSiblings(vIndex, hIndex);
     return (
       siblings.some(el => {
-        return el.value === "O" || el.value === "X";
+        return el.value === "◯" || el.value === "╳";
       }) 
     );
   }
@@ -219,18 +219,18 @@ class Grid extends React.Component {
       this.socket.emit("register player", [
         window.innerWidth,
         window.innerHeight
-      ],this.props.roomName,"O");
+      ],this.props.roomName,"◯");
 
       this.setState(state => ({
-        myPlayer:"O"
+        myPlayer:"◯"
       }));
     }else{
       this.socket.emit("register player", [
         window.innerWidth,
         window.innerHeight
-      ],null,"X");
+      ],null,"╳");
       this.setState(state => ({
-        myPlayer:"X"
+        myPlayer:"╳"
       }));
     }
   }

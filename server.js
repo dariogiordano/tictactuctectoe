@@ -35,7 +35,7 @@ const mountGrid = match => {
   const centerHIndex = Math.floor(w / 2);
   let grid = [];
   for (let i = 0; i < h; i++) grid.push(new Array(w).fill("empty"));
-  let otherPlayer = match.actualPlayer === "O" ? "X" : "O";
+  let otherPlayer = match.actualPlayer === "◯" ? "╳" : "◯";
   grid[centerVIndex].splice(centerHIndex, 1, otherPlayer);
   return grid;
 };
@@ -87,7 +87,7 @@ io.on("connection", socket => {
 
   socket.on("moved", (state,vIndex, hIndex) => {
     let match=matches.find(match=>match.roomName===state.roomName);
-    match.actualPlayer = match.actualPlayer === "O" ? "X" : "O";
+    match.actualPlayer = match.actualPlayer === "◯" ? "╳" : "◯";
     state.actualPlayer = match.actualPlayer;
     console.log(`Update room n° ${socket.roomName}`)
     io.to(state.roomName).emit("update", state,vIndex, hIndex);
@@ -106,7 +106,7 @@ io.on("connection", socket => {
   socket.on("new game", state => {
     console.log(`New game in room n° ${socket.roomName}`)
     let match=matches.find(match=>match.roomName===state.roomName);
-    match.actualPlayer = state.myPlayer === "O" ? "X" : "O";
+    match.actualPlayer = state.myPlayer === "◯" ? "╳" : "◯";
     state.actualPlayer = match.actualPlayer;
     state.grid = mountGrid(match);
     state.matchStatus = "new game";
