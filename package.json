@@ -1,6 +1,9 @@
 {
   "name": "ttttt",
   "version": "0.1.0",
+  "engines": {
+    "node": "16.20.2"
+  },
   "private": true,
   "dependencies": {
     "@babel/core": "7.1.0",
